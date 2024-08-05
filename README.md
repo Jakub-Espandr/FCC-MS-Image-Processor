@@ -22,7 +22,7 @@ The application supports the calculation of the following vegetation indices:
 
 Visualization of results.
 - Exporting results: the resulting images and data can be exported for further analysis and processing.
-- 
+
 New Features:
 
 Web Server Deployment: The application now runs on a web server, making it accessible from any device with an internet connection.
