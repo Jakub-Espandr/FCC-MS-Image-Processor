@@ -6,19 +6,19 @@ FlyCamCzech MultiSpectral Image Processor (FCC MS Image Processor) is a sophisti
 The application is designed to serve primarily enthusiasts who specialize in vegetation analysis using multispectral imagery. The main functionalities and features of the application include:
 - Import of multispectral imagery.
 - The application supports the calculation of the following vegetation indices:
-NDVI (Normalized Difference Vegetation Index)
-ENDVI (Enhanced Normalized Difference Vegetation Index)
-SAVI (Soil-Adjusted Vegetation Index)
-TVI (Transformed Vegetation Index)
-GNDVI (Green Normalized Difference Vegetation Index)
-MSAVI (Modified Soil-Adjusted Vegetation Index)
-CVI (Chlorophyll Vegetation Index)
-CVI2 (Enhanced Chlorophyll Vegetation Index)
-PRI (Photochemical Reflectance Index)
-NDWI (Normalized Difference Water Index)
-VARI (Visible Atmospherically Resistant Index)
-EVI (Enhanced Vegetation Index)
-NG (Normalized Green Index)
+- NDVI (Normalized Difference Vegetation Index)
+- ENDVI (Enhanced Normalized Difference Vegetation Index)
+- SAVI (Soil-Adjusted Vegetation Index)
+- TVI (Transformed Vegetation Index)
+- GNDVI (Green Normalized Difference Vegetation Index)
+- MSAVI (Modified Soil-Adjusted Vegetation Index)
+- CVI (Chlorophyll Vegetation Index)
+- CVI2 (Enhanced Chlorophyll Vegetation Index)
+- PRI (Photochemical Reflectance Index)
+- NDWI (Normalized Difference Water Index)
+- VARI (Visible Atmospherically Resistant Index)
+- EVI (Enhanced Vegetation Index)
+- NG (Normalized Green Index)
 - Visualization of results.
 - Exporting results: the resulting images and data can be exported for further analysis and processing.
 
