@@ -2,7 +2,7 @@ FCC-MS-Image-Processor
 
 FlyCamCzech MultiSpectral Image Processor
 
-FlyCamCzech MultiSpectral Image Processor (FCC MS Image Processor) is a sophisticated application developed to analyze multispectral images obtained from modified camera systems. The primary objective of this application is to generate key vegetation indices that are essential for scientific research and vegetation monitoring. This application is part of the thesis of Bc. Jakub Ešpander entitled Classification of UAV image data within selected areas (Klasifikace UAV obrazových dat v rámci vybraných území).
+FlyCamCzech MultiSpectral Image Processor (FCC MS Image Processor) is a sophisticated application developed to analyze multispectral images obtained from modified camera systems. The primary objective of this application is to generate key vegetation indices that are essential for scientific research and vegetation monitoring. This application is part of the thesis of Bc. Jakub Ešpandr entitled Classification of UAV image data within selected areas (Klasifikace UAV obrazových dat v rámci vybraných území).
 
 The application is designed to serve primarily enthusiasts who specialize in vegetation analysis using multispectral imagery. The main functionalities and features of the application include:
 
