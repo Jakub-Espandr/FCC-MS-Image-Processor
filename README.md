@@ -28,4 +28,4 @@ The application uses modern technologies such as Python for image data processin
 
 The uniqueness of the application lies in its simple and user-friendly interface that facilitates the analysis of multispectral images, which is commonly considered a complex and technically demanding process. The application is designed to be accessible even to users with limited experience in image data analysis, thus greatly simplifying the process of calculating and interpreting vegetation indices from multispectral imagery. This enables faster and more efficient vegetation analysis, which is crucial for research in agriculture, ecology and environmental sciences.
 
-Future development of the application includes extending support for additional vegetation indices (e.g. EVI - Enhanced Vegetation Index) and improving the user interface to increase the comfort and efficiency of working with the application.
+Future development of the application includes extending support for additional vegetation indices, adding new handy features and improving the user interface to increase the comfort and efficiency of working with the application.
