@@ -19,7 +19,9 @@ The application is designed to serve primarily enthusiasts who specialize in veg
 - VARI (Visible Atmospherically Resistant Index)
 - EVI (Enhanced Vegetation Index)
 - NG (Normalized Green Index)
-- Visualization of results.
+
+
+Visualization of results.
 - Exporting results: the resulting images and data can be exported for further analysis and processing.
 
 The application uses modern technologies such as Python for image data processing and analysis, OpenCV for image manipulation and calculation of vegetation indices, Matplotlib for visualization of results and GUI libraries (Tkinter or PyQt) for intuitive user interface.
