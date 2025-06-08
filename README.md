@@ -1,81 +1,87 @@
-FlyCamCzech MultiSpectral Image Processor
+<p align="center">
+  <a href="https://i.imghippo.com/files/pWPz7890sA.jpg">
+    <img src="https://i.imghippo.com/files/pWPz7890sA.jpg" alt="FCC MS Image Processor" width="250"/>
+  </a>
+</p>
 
-FlyCamCzech MultiSpectral Image Processor (FCC MS Image Processor) is a sophisticated application developed to analyze multispectral images obtained from modified camera systems. The primary objective of this application is to generate key vegetation indices that are essential for scientific research and vegetation monitoring. This application is part of the thesis of Bc. Jakub Ešpandr entitled Classification of UAV Image Data within Selected Areas (Klasifikace UAV obrazových dat v rámci vybraných území).
+<h1 align="center">FlyCamCzech MultiSpectral Image Processor</h1>
+<p align="center"><em>(FlyCamCzech | Jakub Ešpandr)</em></p>
 
-The application is designed to serve primarily enthusiasts who specialize in vegetation analysis using multispectral imagery. The main functionalities and features of the application include:
+---
 
-Import of multispectral imagery.
-The application supports the calculation of the following vegetation indices:
-- BGI (Blue-Green Index)  
-- BI (Brightness Index)  
-- BNDVI (Blue Normalized Difference Vegetation Index)  
-- BWDRVI (Blue Wide Dynamic Range Vegetation Index)  
-- CIg (Chlorophyll Index – Green)  
-- CIred (Chlorophyll Index - Red)  
-- CIVE (Color Index of Vegetation Extraction)  
-- CVI (Chlorophyll Vegetation Index)  
-- CVI2 (Chlorophyll Vegetation Index 2)  
-- DVI (Difference Vegetation Index)  
-- ENDVI (Enhanced NDVI)  
-- ENDVI_RGN (Enhanced Normalized Difference Vegetation Index (RGN equivalent calculated with different bands))  
-- EVI (Enhanced Vegetation Index)  
-- EVI2 (Two-band Enhanced Vegetation Index)  
-- EVI_Mod (Enhanced Vegetation Index (Modified))  
-- ExG (Excess Green Index)  
-- ExGR (Excess Green minus Excess Red)  
-- ExR (Excess Red Index)  
-- GBNDVI (Green-Blue NDVI)  
-- GCC (Green Chromatic Coordinate)  
-- GLI (Green Leaf Index)  
-- GLI2 (Modified Green Leaf Index)  
-- GNDVI (Green NDVI)  
-- GNDWI (Green Normalized Difference Water Index)  
-- GOSAVI (Green Optimized Soil Adjusted Vegetation Index)  
-- GRNDVI (Green-Red NDVI (adapted))  
-- GRVI (Green-Red Vegetation Index)  
-- MExG (Modified Excess Green Index)  
-- MSAVI (Modified Soil Adjusted Vegetation Index)  
-- MTVI2 (Modified Triangular Vegetation Index 2)  
-- NDBI (Normalized Difference Built-up Index (RGB version))  
-- NDBI-Blue (Normalized Difference Blue Index)  
-- NGBDI (Normalized Green-Blue Difference Index)  
-- NGBVI (Normalized Green–Blue Vegetation Index)  
-- NDGI (Normalized Difference Green Index)  
-- NDVI (Normalized Difference Vegetation Index)  
-- NDVI_Mod (Modified NDVI)  
-- NDWI (Normalized Difference Water Index)  
-- NDTI (Normalized Difference Turbidity Index)  
-- NG (Normalized Green)  
-- NGRDI (Normalized Green-Red Difference Index)  
-- OSAVI (Optimized SAVI)  
-- PRI (Photochemical Reflectance Index)  
-- RGBVI (RGB Vegetation Index)  
-- RDVI (Renormalized Difference Vegetation Index)  
-- RGRI (Red-Green Ratio Index)  
-- SAVI (Soil Adjusted Vegetation Index)  
-- SCI (Soil Colour Index)  
-- SR (Simple Ratio Index)  
-- TGI (Triangular Greenness Index)  
-- TVI (Transformed Vegetation Index)  
-- UI (Urban Index)  
-- VARI (Visible Atmospherically Resistant Index)  
-- VDVI (Visible Difference Vegetation Index)  
-- VEG (Vegetative Index)  
-- WDRVI (Wide Dynamic Range Vegetation Index)  
+## Overview
 
-Visualization of results.
-- Exporting results: the resulting images and data can be exported for further analysis and processing.
+The **FlyCamCzech MultiSpectral Image Processor (FCC MS Image Processor)** is a powerful and user-friendly application designed for analyzing multispectral UAV imagery. Developed as part of the thesis of **Bc. Jakub Ešpandr** (*Classification of UAV Image Data within Selected Areas*), the software allows for intuitive calculation, visualization, and export of over 50 vegetation indices.
 
-New Features:
+Originally developed for scientific and environmental monitoring purposes, the tool is now accessible via a modern **web interface**, usable from any device with a browser.
 
-Web Server Deployment: The application now runs on a web server, making it accessible from any device with an internet connection.
-Enhanced Options: Added new features to provide more options and flexibility for users.
-The application uses modern technologies such as Python for image data processing and analysis, OpenCV for image manipulation and calculation of vegetation indices, Matplotlib for visualization of results, and GUI libraries (Tkinter or PyQt) for an intuitive user interface.
+---
 
-The uniqueness of the application lies in its simple and user-friendly interface that facilitates the analysis of multispectral images, which is commonly considered a complex and technically demanding process. The application is designed to be accessible even to users with limited experience in image data analysis, greatly simplifying the process of calculating and interpreting vegetation indices from multispectral imagery. This enables faster and more efficient vegetation analysis, crucial for research in agriculture, ecology, and environmental sciences.
+## Key Features
 
-Future Development:
+- 🌱 **Vegetation Index Calculation**  
+  Supports more than **50 spectral indices** used in plant health and land cover analysis (NDVI, GNDVI, CIg, SAVI, VARI...).
+  
+- 🖼️ **Multispectral Image Import**  
+  Load aligned image bands from modified camera setups or UAV sensors.
 
-Extending support for additional vegetation indices.
-Adding new handy features.
-Improving the user interface to increase the comfort and efficiency of working with the application.
+- 📊 **Visualization Tools**  
+  Real-time display of processed indices using colormaps and overlays.
+
+- 💾 **Data Export**  
+  Save results as processed images or raw data for further analysis.
+
+- 🌐 **Web Interface**  
+  The entire app runs in-browser via a lightweight Python web server.
+
+---
+
+<details>
+<summary><strong>📚 Supported Vegetation Indices (Click to expand)</strong></summary>
+
+- BGI, BI, BNDVI, BWDRVI  
+- CIg, CIred, CIVE, CVI, CVI2  
+- DVI, ENDVI, ENDVI_RGN, EVI, EVI2, EVI_Mod  
+- ExG, ExGR, ExR  
+- GBNDVI, GCC, GLI, GLI2  
+- GNDVI, GNDWI, GOSAVI, GRNDVI, GRVI, MExG  
+- MSAVI, MTVI2, NDBI, NDBI-Blue  
+- NGBDI, NGBVI, NDGI, NDVI, NDVI_Mod  
+- NDWI, NDTI, NG, NGRDI  
+- OSAVI, PRI, RGBVI, RDVI, RGRI  
+- SAVI, SCI, SR, TGI, TVI  
+- UI, VARI, VDVI, VEG, WDRVI
+
+</details>
+
+---
+
+## Technologies Used
+
+- **Python** – Core processing logic  
+- **OpenCV** – Image reading and manipulation  
+- **Matplotlib** – Plotting and visualization  
+- **Flask / Tkinter / PyQt** – Web and desktop GUI  
+- **Custom colormaps** – Tailored for scientific readability
+
+---
+
+## About
+
+This application simplifies complex multispectral analysis workflows for both professionals and enthusiasts in:
+
+- 🌾 **Precision Agriculture**  
+- 🌍 **Environmental Monitoring**  
+- 🧪 **Scientific Research**  
+- 🌳 **Vegetation Health Assessment**
+
+It is intended to reduce the technical barrier for vegetation monitoring using UAVs.
+
+---
+
+## License
+
+Licensed under the **Non-Commercial Public License (NCPL v1.0)**  
+© 2025 Jakub Ešpandr – FlyCamCzech.eu
+
+---
