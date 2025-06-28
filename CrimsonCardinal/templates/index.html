@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO & Meta -->
+    <title>FCC MS Image Processor | FlyCamCzech</title>
+    <meta name="description" content="FCC MS Image Processor is a multispectral image analysis tool developed by FlyCamCzech.eu and Born4Flight s.r.o. to compute vegetation indices from UAV imagery." />
+    <meta name="author" content="Jakub Ešpandr, FlyCamCzech.eu" />
+    <meta name="keywords" content="vegetation index, multispectral analysis, NDVI, UAV, image processing, FlyCamCzech, Born4Flight, FCC MS Image Processor" />
+
+    <!-- Open Graph (Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="FCC MS Image Processor | FlyCamCzech" />
+    <meta property="og:description" content="Analyze multispectral UAV images and generate vegetation indices. Developed by FlyCamCzech.eu and Born4Flight s.r.o. for scientific and environmental research." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.flycamczech-imageprocessor.eu/" />
+    <meta property="og:image" content="https://www.flycamczech-imageprocessor.eu/static/og-preview.jpg" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FCC MS Image Processor" />
+    <meta name="twitter:description" content="Web-based tool for multispectral vegetation index analysis by FlyCamCzech.eu and Born4Flight s.r.o." />
+    <meta name="twitter:image" content="https://www.flycamczech-imageprocessor.eu/static/og-preview.jpg" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        /* === Základní styly === */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            background: radial-gradient(#050505, #0a0a0a);
+            font-family: 'Poppins', sans-serif; /* nebo 'Courier New', podle potřeby */
+            color: #00ffcc; /* pokud chceš zachovat neonové písmo */
+            box-sizing: border-box;
+        }
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        .full-screen-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            min-height: 100%;
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            width: 100%;
+            padding: 2rem 5vw;
+            background-color: transparent;
+            box-shadow: none;
+            border-radius: 0;
+            animation: none;
+            overflow: visible; /* dříve auto */
+            height: auto;      /* dříve 100% */
+            z-index: 3;
+            position: relative;
+            display: none;
+            padding-top: 2.5rem; /* přidá místo pro nadpis a logo */
+        }
+
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            display: block;
+            margin: 2rem auto 1rem!important; /* místo původního margin: 0 auto 1rem */
+            max-width: 140px;
+            transition: transform 0.2s ease;
+        }
+
+
+        .logo:hover {
+            transform: scale(1.03);
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            color: #343a40;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            line-height: 1.2;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .form-select,
+        .form-control,
+        .form-control-file {
+            padding: 0.75rem;
+            font-size: 1rem;
+            border-radius: 6px;
+            /* Menší radius */
+            border: 1px solid #ced4da;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            box-shadow: none;
+            /* Odstranění vnitřního stínu pro čistší vzhled */
+        }
+
+        .form-select:focus,
+        .form-control:focus,
+        .form-control-file:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        #method_description {
+            font-size: 0.9rem;
+            color: #9da3a6;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #6A11CB;
+            /* Jedna výrazná akcentní barva */
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #5c0fb2;
+            transform: translateY(-1px);
+        }
+
+        .btn-info,
+        .download-button {
+            background-color: transparent;
+            color: #6A11CB;
+            border: 2px solid #6A11CB;
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-info:hover,
+        .download-button:hover {
+            background-color: #6A11CB;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .download-button {
+            opacity: 0;
+        }
+
+        .download-button.show {
+            display: block;
+            opacity: 1;
+        }
+
+        #all_descriptions {
+            font-size: 0.95rem;
+            color: #6c757d;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 0.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            display: none;
+            /* Skryto, dokud se neklikne na "Show Spectral Indices" */
+        }
+
+        .highlight {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .spacing {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .spacing>* {
+            margin: 0.25rem;
+        }
+
+        .image-preview {
+            margin-top: 1.5rem;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .enlarge-button {
+            margin-top: 1rem;
+            background-color: #6A11CB;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .enlarge-button:hover {
+            background-color: #5c0fb2;
+            transform: translateY(-1px);
+        }
+
+        .full-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .full-screen.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .full-screen img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 6px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .close-button:hover {
+            background-color: #c82333;
+            transform: rotate(90deg);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #adb5bd;
+            margin-bottom: 8rem;
+        }
+
+        .footer a {
+            color: #adb5bd;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #6c757d;
+        }
+
+        /* === Responsivita === */
+        @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                overflow-y: auto; /* Přístup ke scrollování */
+            }
+
+            .form-container {
+                padding: 2rem 1.5rem;
+                z-index: 3;
+                position: relative;
+                padding-top: 1.5rem; /* přidá místo pro nadpis a logo */
+            }
+
+     
+
+            .logo {
+                max-width: 120px !important; /* nebo klidně 140px */
+                margin-top: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .spacing {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .spacing>* {
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 1.5rem 1rem;
+                z-index: 3;
+                position: relative;
+                padding-top: 1.5rem; /* přidá místo pro nadpis a logo */
+            }
+
+            .logo {
+                max-width: 120px !important; /* nebo klidně 140px */
+                margin-top: 0.5rem !important;
+                margin-bottom: 0.5rem !important;
+            }
+
+            h1.neon-title {
+                font-size: 1.25rem;
+                scroll-margin-top: 4rem;
+            }
+
+            .image-preview img {
+                max-height: 200px;
+            }
+
+            .form-label {
+                font-size: 0.8rem;
+            }
+
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .spacing {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .spacing > * {
+                width: 100% !important;
+                margin-bottom: 0.75rem;
+            }
+        }
+
+        /* === Processing Overlay === */
+        .processing {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #3498db;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .processing-text {
+            margin-top: 1rem;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .dot {
+            animation: blink 1.4s infinite both;
+            font-size: 1.25rem;
+            color: #343a40;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: .2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: .4s;
+        }
+
+
+        #method_description {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            color: #ff00cc;
+            text-shadow: 0 0 5px #ff00cc, 0 0 10px #ff66cc, 0 0 20px #ff00cc;
+        }
+        
+        .neon-title {
+            font-family: 'Courier New', monospace;
+            color: #ffaa33;
+            text-shadow: 
+                0 0 5px #ffaa33,
+                0 0 10px #ff8800,
+                0 0 20px #ffaa33,
+                0 0 30px #ff6600;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            scroll-margin-top: 4rem;
+        }
+
+
+        @keyframes blink {
+
+            0%,
+            20% {
+                color: rgba(52, 58, 64, 0);
+                text-shadow: .25em 0 0 rgba(52, 58, 64, 0), .5em 0 0 rgba(52, 58, 64, 0);
+            }
+
+            20.1%,
+            40% {
+                color: #343a40;
+                text-shadow: .25em 0 0 rgba(52, 58, 64, 0), .5em 0 0 rgba(52, 58, 64, 0);
+            }
+
+            40.1%,
+            60% {
+                text-shadow: .25em 0 0 #343a40, .5em 0 0 rgba(52, 58, 64, 0);
+            }
+
+            60.1%,
+            80% {
+                text-shadow: .25em 0 0 #343a40, .5em 0 0 #343a40;
+            }
+
+            80.1%,
+            100% {
+                text-shadow: .25em 0 0 #343a40, .5em 0 0 #343a40;
+            }
+        }
+
+        /* Animace pro písmena ve footeru */
+        .highlight-on-load span {
+            display: inline-block;
+            opacity: 0;
+            animation-fill-mode: forwards;
+            animation-name: letter-by-letter;
+            animation-duration: 0.5s;
+        }
+
+        @keyframes letter-by-letter {
+            0% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+
+
+
+
+
+
+
+        /* Překryvná načítací obrazovka přes celou stránku */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: radial-gradient(#050505, #0a0a0a);
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ffcc;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .glow {
+            text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+        }
+
+        .dots::after {
+            content: '...';
+            animation: dots 1.5s steps(3, end) infinite;
+        }
+
+        .dots {
+            font-family: 'Courier New', monospace;
+            color: #00ffcc;
+            text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+            background: transparent !important;
+        }
+
+
+        #loading-screen,
+        #status-container,
+        .glow,
+        .status,
+        .glitch {
+            background: transparent !important;
+        }
+
+
+        #main-title,
+        #main-title *,
+        .glitch,
+        .glitch::before,
+        .glitch::after {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        #main-title,
+        #main-title *,
+        h1#main-title,
+        h1#main-title span,
+        .glitch,
+        .glitch::before,
+        .glitch::after {
+            background-color: transparent !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            outline: none !important;
+            backdrop-filter: none !important;
+        }
+
+
+        @keyframes dots {
+
+            0%,
+            20% {
+                content: '';
+            }
+
+            40% {
+                content: '.';
+            }
+
+            60% {
+                content: '..';
+            }
+
+            80%,
+            100% {
+                content: '...';
+            }
+        }
+
+        .glitch {
+            font-family: 'Courier New', monospace;
+            color: #00ffcc;
+            text-shadow: 0 0 5px #00ffcc, 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+        }
+
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            color: #00ffff;
+            clip: rect(0, 900px, 0, 0);
+        }
+
+        .glitch::before {
+            animation: glitchTop 2s infinite linear alternate-reverse;
+            color: #00ffff;
+        }
+
+        .glitch::after {
+            animation: glitchBottom 2.5s infinite linear alternate-reverse;
+            color: #ff00cc;
+        }
+
+        @keyframes glitchTop {
+            0% {
+                clip: rect(0, 9999px, 0, 0);
+            }
+
+            10% {
+                clip: rect(0, 9999px, 30px, 0);
+                transform: translate(-3px, -2px);
+            }
+
+            20% {
+                clip: rect(0, 9999px, 0, 0);
+            }
+        }
+
+        @keyframes glitchBottom {
+            0% {
+                clip: rect(0, 9999px, 0, 0);
+            }
+
+            10% {
+                clip: rect(60px, 9999px, 90px, 0);
+                transform: translate(3px, 2px);
+            }
+
+            20% {
+                clip: rect(0, 9999px, 0, 0);
+            }
+        }
+
+        .hex-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: pulse 4s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 0.1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 1.2em;
+            transition: all 0.5s ease;
+            opacity: 0.3;
+            transform: scale(0.85) translateY(0);
+            filter: blur(0.5px);
+        }
+
+        .active {
+            opacity: 1 !important;
+            transform: scale(1) translateY(0) !important;
+            filter: none !important;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .numbers {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9em;
+            color: #00ffaa;
+            text-shadow: 0 0 5px #00ffaa;
+            font-family: monospace;
+            z-index: 3;
+        }
+
+
+
+        #loading-screen {
+            display: block;
+            position: absolute; /*fixed */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh;
+            background: transparent;
+            z-index: 9999;
+            overflow: hidden;
+        }
+
+        canvas,
+        .hex-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+
+        canvas,
+            .hex-grid,
+            .container {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            text-align: center;
+        }
+
+
+        /* Ujisti se, že středový container je 100% průhledný */
+        .container,
+        #status-container,
+        .glow,
+        .glitch,
+        .status {
+            background: transparent !important;
+            backdrop-filter: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+
+        /* Vnitřní text by neměl mít žádný obal ani pozadí */
+        .glitch::before,
+        .glitch::after {
+            background: transparent !important;
+        }
+
+        /* Pro jistotu */
+        #main-title {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .label-glow {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Fluorescenční žlutá glow */
+        .label-fluo {
+            color: #fff933;
+            text-shadow: 0 0 5px #fff933, 0 0 10px #fff933, 0 0 20px #fff933;
+        }
+
+        .label-pink {
+            color: #ff33cc;
+            text-shadow: 0 0 5px #ff33cc, 0 0 15px #ff33cc;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+
+
+
+    </style>
+    <script>
+        const methodDescriptions = {
+            '1': 'NDVI - Normalized Difference Vegetation Index',
+            '2': 'NDVI_NGB - Normalized Difference Vegetation Index (NGB equivalent calculated with different bands)',
+            '3': 'ENDVI - Enhanced Normalized Difference Vegetation Index',
+            '4': 'ENDVI_RGN - Enhanced Normalized Difference Vegetation Index (RGN equivalent calculated with different bands)',
+            '5': 'SAVI - Soil Adjusted Vegetation Index',
+            '6': 'TVI - Transformed Vegetation Index',
+            '7': 'GNDVI - Green Normalized Difference Vegetation Index',
+            '8': 'MSAVI - Modified Soil Adjusted Vegetation Index',
+            '9': 'CVI - Chlorophyll Vegetation Index',
+            '10': 'CVI2 - Chlorophyll Vegetation Index 2',
+            '11': 'PRI - Photochemical Reflectance Index',
+            '12': 'NDWI - Normalized Difference Water Index',
+            '13': 'VARI - Visible Atmospherically Resistant Index',
+            '14': 'EVI - Enhanced Vegetation Index',
+            '15': 'NG - Normalized Green',
+            '16': 'NGRDI - Normalized Green-Red Difference Index',
+            '17': 'ExG - Excess Green Index',
+            '18': 'ExR - Excess Red Index',
+            '19': 'ExGR - Excess Green minus Excess Red',
+            '20': 'GLI - Green Leaf Index',
+            '21': 'RGBVI - RGB Vegetation Index',
+            '22': 'TGI - Triangular Greenness Index',
+            '23': 'NGBDI - Normalized Green-Blue Difference Index',
+            '24': 'VDVI - Visible Difference Vegetation Index',
+            '25': 'MExG - Modified Excess Green Index',
+            '26': 'VEG - Vegetative Index',
+            '27': 'GCC - Green Chromatic Coordinate',
+            '28': 'CIVE - Color Index of Vegetation Extraction',
+            '29': 'NDTI - Normalized Difference Turbidity Index',
+            '30': 'SCI - Soil Colour Index',
+            '31': 'NDBI - Normalized Difference Built-up Index (RGB version)',
+            '32': 'BI - Brightness Index',
+            '33': 'UI - Urban Index',
+            '34': 'NDVI_Mod - Modified NDVI',
+            '35': 'GNDVI - Green NDVI',
+            '36': 'NDBI-Blue - Normalized Difference Blue Index',
+            '37': 'NDGI - Normalized Difference Green Index',
+            '38': 'BGI - Blue-Green Index',
+            '39': 'EVI_Mod - Enhanced Vegetation Index (Modified)',
+            '40': 'MSAVI - Modified Soil Adjusted Vegetation Index',
+            '41': 'ENDVI - Enhanced NDVI',
+            '42': 'GNDWI - Green Normalized Difference Water Index',
+            '43': 'CIG - Chlorophyll Index - Green',
+            '44': 'GBNDVI - Green-Blue NDVI',
+            '45': 'GSAVI - Green Soil Adjusted Vegetation Index',
+            '46': 'GRNDVI - Green-Red NDVI (adapted)',
+            '48': 'GOSAVI - Green Optimized Soil Adjusted Vegetation Index',
+            '49': 'NDWI - Normalized Difference Water Index',
+            '50': 'BNDVI - Blue Normalized Difference Vegetation Index',
+            '51': 'NGBVI - Normalized Green–Blue Vegetation Index',
+            '52': 'CIg - Chlorophyll Index – Green',
+            '53': 'BWDRVI - Blue Wide Dynamic Range Vegetation Index',
+            '54': 'NDVI - Normalized Difference Vegetation Index',
+            '55': 'GNDVI - Green NDVI',
+            '56': 'SAVI - Soil Adjusted Vegetation Index',
+            '57': 'MSAVI - Modified SAVI',
+            '58': 'OSAVI - Optimized SAVI',
+            '59': 'EVI2 - Two-band Enhanced Vegetation Index',
+            '60': 'SR - Simple Ratio Index',
+            '61': 'RDVI - Renormalized Difference Vegetation Index',
+            '62': 'WDRVI - Wide Dynamic Range Vegetation Index',
+            '63': 'MTVI2 - Modified Triangular Vegetation Index 2',
+            '64': 'DVI - Difference Vegetation Index',
+            '65': 'NDWI - Normalized Difference Water Index',
+            '66': 'CIg - Chlorophyll Index - Green',
+            '67': 'CIred - Chlorophyll Index - Red',
+            '68': 'CVI - Chlorophyll Vegetation Index',
+            '69': 'GRVI - Green-Red Vegetation Index',
+            '70': 'RGRI - Red-Green Ratio Index',
+            '71': 'NGRDI - Normalized Green-Red Difference Index',
+            '72': 'GLI2 - Modified Green Leaf Index'
+        };
+
+        const methodDetails = {
+            '1': 'NDVI is widely used to assess vegetation health, monitor crop growth, estimate crop yields, and identify areas affected by drought. It helps in determining the greenness and density of vegetation by measuring the difference in reflectance between near-infrared (NIR) and red light. Applications: Agriculture, forestry, drought monitoring, land cover change detection, and climate studies.',
+            '2': 'NDVI_NGB is the NGB equivalent of NDVI, calculated with different bands. Applications: Similar to NDVI but for NGB band combinations.',
+            '3': 'ENDVI enhances the sensitivity of vegetation indices by incorporating green reflectance, making it more effective in distinguishing between different types of vegetation and stress levels. Applications: Similar to NDVI but with improved sensitivity in varied vegetation conditions.',
+            '4': 'ENDVI_RGN is the RGN equivalent of ENDVI, calculated with different bands. Applications: Similar to ENDVI but for RGN band combinations.',
+            '5': 'SAVI is designed to minimize soil brightness influences, making it useful for assessing vegetation in areas with sparse plant cover where soil reflectance affects measurements. Applications: Agriculture, soil and vegetation studies, arid and semi-arid region monitoring.',
+            '6': 'TVI adjusts the NDVI formula to improve sensitivity to vegetation greenness and reduce soil brightness influences. Applications: Agriculture, vegetation monitoring, ecological studies.',
+            '7': 'GNDVI uses green light reflectance instead of red, which can be more sensitive to chlorophyll concentration and water content in vegetation. Applications: Crop monitoring, forest management, water stress detection.',
+            '8': 'MSAVI further reduces soil brightness influences and is more effective in areas with sparse vegetation. Applications: Agriculture, soil and vegetation studies, environmental monitoring.',
+            '9': 'CVI is used to estimate chlorophyll content in plants, providing insights into plant health and productivity. Applications: Crop health monitoring, precision agriculture, ecological studies.',
+            '10': 'CVI2 is an enhanced version of CVI that provides more accurate chlorophyll content estimation by incorporating additional spectral bands. Applications: Detailed vegetation analysis, agricultural research, plant physiology studies.',
+            '11': 'PRI measures the efficiency of photosynthesis in plants by assessing changes in carotenoid pigments. Applications: Plant stress detection, photosynthetic activity monitoring, ecological research.',
+            '12': 'NDWI is used to monitor water content in vegetation and detect changes in water bodies. Applications: Water stress monitoring, drought assessment, wetland mapping.',
+            '13': 'VARI is designed to minimize atmospheric effects on vegetation indices, making it useful in variable atmospheric conditions. Applications: Vegetation monitoring in urban areas, atmospheric studies.',
+            '14': 'EVI enhances sensitivity to vegetation by correcting for atmospheric conditions and soil background signals. Applications: Detailed vegetation monitoring, forest health assessment, agricultural productivity analysis.',
+            '15': 'NG index focuses on the green band to assess vegetation health, particularly in regions with dense vegetation. Applications: Dense forest monitoring, agricultural studies, ecological research.',
+            '16': 'NGRDI (Normalized Green-Red Difference Index) highlights green vegetation areas by comparing green and red bands. Applications: Substitute for NDVI in RGB images, vegetation analysis.',
+            '17': 'ExG (Excess Green Index) emphasizes green areas by calculating excess green content. Applications: Detection of green vegetation, precision agriculture.',
+            '18': 'ExR (Excess Red Index) enhances dry vegetation and soil areas by emphasizing red content. Applications: Soil and dry vegetation mapping.',
+            '19': 'ExGR (Excess Green minus Excess Red) combines ExG and ExR to better suppress red areas. Applications: Vegetation monitoring, reducing red artifacts.',
+            '20': 'GLI (Green Leaf Index) normalizes excess green to total reflectance, providing robust vegetation coverage analysis. Applications: Crop monitoring, canopy cover estimation.',
+            '21': 'RGBVI (RGB Vegetation Index) uses quadratic formula to highlight vegetation. Applications: Green area enhancement in urban or rural environments.',
+            '22': 'TGI (Triangular Greenness Index) estimates chlorophyll concentration using specific red, green, and blue wavelengths. Applications: Chlorophyll content estimation, vegetation health.',
+            '23': 'NGBDI (Normalized Green-Blue Difference Index) contrasts green and blue bands to differentiate vegetation from water or shadow. Applications: Vegetation-water discrimination, urban studies.',
+            '24': 'VDVI (Visible Difference Vegetation Index) measures vegetation cover using visible spectrum bands. Applications: Vegetation density mapping.',
+            '25': 'MExG (Modified Excess Green Index) improves on ExG by adjusting coefficients for better vegetation separation. Applications: Vegetation detection with enhanced accuracy.',
+            '26': 'VEG (Vegetative Index) highlights vegetative areas by relating green reflectance to red and blue. Applications: Vegetation analysis, soil differentiation.',
+            '27': 'GCC (Green Chromatic Coordinate) calculates ratio of green to total reflectance. Applications: Phenology studies, vegetation monitoring.',
+            '28': 'CIVE (Color Index of Vegetation Extraction) emphasizes vegetation for segmentation purposes. Applications: Vegetation extraction, image classification.',
+            '29': 'NDTI (Normalized Difference Turbidity Index) assesses water turbidity and sediment levels. Applications: Water quality analysis, sediment mapping.',
+            '30': 'SCI (Soil Colour Index) uses visible bands to evaluate soil color properties. Applications: Soil mapping, agricultural land analysis.',
+            '31': 'NDBI (Normalized Difference Built-up Index, RGB version) highlights built-up and urban areas. Applications: Urban mapping, infrastructure analysis.',
+            '32': 'BI (Brightness Index) measures overall brightness of a scene, useful for detecting dry soil or urban areas. Applications: Brightness analysis, land classification.',
+            '33': 'UI (Urban Index) emphasizes built-up areas using red and blue bands. Applications: Urban feature detection, impervious surface mapping.',
+            '34': 'NDVI_Mod (Modified NDVI) adjusts NDVI to use the green band instead of red, offering better vegetation assessment in certain conditions. Applications: Vegetation health analysis.',
+            '35': 'GNDVI (Green NDVI) is more sensitive to chlorophyll content using NIR and green bands. Applications: Crop health monitoring, chlorophyll concentration.',
+            '36': 'NDBI-Blue (Normalized Difference Blue Index) differentiates vegetation from water by comparing NIR and blue bands. Applications: Vegetation vs. water discrimination.',
+            '37': 'NDGI (Normalized Difference Green Index) uses green and blue bands to estimate vegetation coverage. Applications: Vegetation density mapping.',
+            '38': 'BGI (Blue-Green Index) contrasts green and blue to highlight vegetation and separate it from water or shadow. Applications: Vegetation, water discrimination.',
+            '39': 'EVI_Mod (Modified Enhanced Vegetation Index) enhances vegetation signal while minimizing atmospheric effects, adapted for NGB sensors. Applications: Vegetation health monitoring.',
+            '40': 'MSAVI (Modified Soil Adjusted Vegetation Index) reduces soil brightness influence, especially in sparse vegetation areas. Applications: Vegetation and soil analysis.',
+            '41': 'ENDVI (Enhanced NDVI) improves stability by incorporating green and blue bands, effective under various vegetation conditions. Applications: Vegetation stress monitoring.',
+            '42': 'GNDWI (Green Normalized Difference Water Index) highlights water presence and content in vegetation using green and NIR bands. Applications: Water stress detection, wetland mapping.',
+            '43': 'CIG (Chlorophyll Index - Green) estimates chlorophyll concentration using NIR and green reflectance. Applications: Crop health, plant productivity monitoring.',
+            '44': 'GBNDVI (Green-Blue NDVI) uses green and blue bands together to highlight vegetation areas. Applications: Vegetation stress assessment.',
+            '45': 'GSAVI (Green Soil Adjusted Vegetation Index) reduces soil effects for vegetation detection by modifying green reflectance. Applications: Vegetation and soil differentiation.',
+            '46': 'GRNDVI (Green-Red NDVI adapted) compares NIR and green bands, emphasizing chlorophyll-rich areas. Applications: Vegetation monitoring.',
+            '48': 'GOSAVI (Green Optimized Soil Adjusted Vegetation Index) optimizes soil adjustment for green reflectance. Applications: Vegetation and soil cover analysis.',
+            '49': 'NDWI (Normalized Difference Water Index) detects water content using green and NIR bands. Applications: Wetland mapping, water stress analysis.',
+            '50': 'BNDVI (Blue Normalized Difference Vegetation Index) offers alternative NDVI calculation using blue band, suitable for NGB cameras. Applications: Vegetation analysis.',
+            '51': 'NGBVI (Normalized Green–Blue Vegetation Index) compares green and blue bands to assess vegetation stress levels. Applications: Healthy vs. stressed vegetation differentiation.',
+            '52': 'CIg (Chlorophyll Index – Green) estimates chlorophyll levels using NIR and green reflectance. Applications: Crop chlorophyll estimation, precision agriculture.',
+            '53': 'BWDRVI (Blue Wide Dynamic Range Vegetation Index) adapts NDVI for dense canopies using blue band and dynamic range adjustment. Applications: Vegetation density analysis, crop monitoring.',
+            '54': 'NDVI (Normalized Difference Vegetation Index) is the fundamental index for assessing vegetation health by comparing near-infrared (NIR) and red bands. Applications: Vegetation coverage, plant vitality, drought monitoring.',
+            '55': 'GNDVI (Green NDVI) enhances sensitivity to chlorophyll content using NIR and green bands, especially in dense vegetation. Applications: Crop health, chlorophyll concentration monitoring.',
+            '56': 'SAVI (Soil Adjusted Vegetation Index) minimizes soil brightness effects by adding an adjustment factor. Applications: Vegetation monitoring in areas with sparse cover, arid regions.',
+            '57': 'MSAVI (Modified SAVI) automatically corrects soil influence without needing the L parameter. Applications: Low vegetation cover analysis, soil-vegetation differentiation.',
+            '58': 'OSAVI (Optimized SAVI) improves SAVI by optimizing the adjustment factor, making it suitable across different soil types. Applications: Accurate vegetation mapping, precision agriculture.',
+            '59': 'EVI2 (Two-band Enhanced Vegetation Index) modifies EVI for RGN sensors, reducing NDVI saturation effects in dense canopies. Applications: Dense vegetation monitoring, forest health.',
+            '60': 'SR (Simple Ratio Index / RVI) is a straightforward ratio between NIR and red bands. Applications: General vegetation analysis, NIR/Red reflectance comparison.',
+            '61': 'RDVI (Renormalized Difference Vegetation Index) modifies NDVI by normalizing with square root, improving linearity. Applications: Dense vegetation, avoiding NDVI saturation.',
+            '62': 'WDRVI (Wide Dynamic Range Vegetation Index) adjusts NDVI using a coefficient, better handling dense vegetation. Applications: Crop monitoring, high biomass areas.',
+            '63': 'MTVI2 (Modified Triangular Vegetation Index 2) estimates chlorophyll using NIR, green, and red bands. Applications: Chlorophyll content, plant stress detection.',
+            '64': 'DVI (Difference Vegetation Index) is a simple difference between NIR and red reflectance. Applications: Vegetation coverage, linear relationship with biomass.',
+            '65': 'NDWI (Normalized Difference Water Index) highlights water content in vegetation using green and NIR bands. Applications: Water stress, wetland mapping.',
+            '66': 'CIg (Chlorophyll Index - Green) estimates chlorophyll content using NIR and green bands. Applications: Crop health, plant productivity analysis.',
+            '67': 'CIred (Chlorophyll Index - Red) provides chlorophyll estimation via NIR and red bands. Applications: Chlorophyll concentration, plant health monitoring.',
+            '68': 'CVI (Chlorophyll Vegetation Index) uses NIR, red, and green bands to assess chlorophyll content and plant vitality. Applications: Crop condition analysis.',
+            '69': 'GRVI (Green-Red Vegetation Index) compares green and red reflectance to analyze vegetation color and condition. Applications: Vegetation health, phenology studies.',
+            '70': 'RGRI (Red-Green Ratio Index) focuses on red to green ratio to detect vegetation greenness or yellowing. Applications: Phenology, plant senescence.',
+            '71': 'NGRDI (Normalized Green-Red Difference Index) provides an alternative to NDVI using only green and red bands, useful for RGB imagery. Applications: Vegetation analysis without NIR data.',
+            '72': 'GLI2 is a modified version of the Green Leaf Index, combining differences between green and both red and blue reflectance. It provides enhanced sensitivity to vegetation and is especially effective in RGB imagery with subtle greenness variation.'
+        };
+
+        const indexOptions = {
+            'RGN': [
+                { value: '66', text: 'CIg' }, { value: '67', text: 'CIred' }, { value: '9', text: 'CVI' },
+                { value: '68', text: 'CVI' }, { value: '10', text: 'CVI2' }, { value: '64', text: 'DVI' },
+                { value: '4', text: 'ENDVI_RGN' }, { value: '14', text: 'EVI' }, { value: '59', text: 'EVI2' },
+                { value: '7', text: 'GNDVI' }, { value: '55', text: 'GNDVI' }, { value: '69', text: 'GRVI' },
+                { value: '8', text: 'MSAVI' }, { value: '57', text: 'MSAVI' }, { value: '63', text: 'MTVI2' },
+                { value: '1', text: 'NDVI' }, { value: '54', text: 'NDVI' }, { value: '12', text: 'NDWI' },
+                { value: '65', text: 'NDWI' }, { value: '15', text: 'NG' }, { value: '71', text: 'NGRDI' },
+                { value: '58', text: 'OSAVI' }, { value: '11', text: 'PRI' }, { value: '61', text: 'RDVI' },
+                { value: '70', text: 'RGRI' }, { value: '5', text: 'SAVI' }, { value: '56', text: 'SAVI' },
+                { value: '60', text: 'SR' }, { value: '6', text: 'TVI' }, { value: '62', text: 'WDRVI' }
+            ],
+            'NGB': [
+                { value: '38', text: 'BGI' }, { value: '53', text: 'BWDRVI' }, { value: '43', text: 'CIG' },
+                { value: '52', text: 'CIg' }, { value: '3', text: 'ENDVI' }, { value: '41', text: 'ENDVI' },
+                { value: '39', text: 'EVI_Mod' }, { value: '44', text: 'GBNDVI' }, { value: '45', text: 'GSAVI' },
+                { value: '46', text: 'GRNDVI' }, { value: '48', text: 'GOSAVI' }, { value: '7', text: 'GNDVI' },
+                { value: '35', text: 'GNDVI' }, { value: '42', text: 'GNDWI' }, { value: '40', text: 'MSAVI' },
+                { value: '2', text: 'NDVI_NGB' }, { value: '34', text: 'NDVI_Mod' }, { value: '50', text: 'BNDVI' },
+                { value: '36', text: 'NDBI-Blue' }, { value: '51', text: 'NGBVI' }, { value: '37', text: 'NDGI' },
+                { value: '49', text: 'NDWI' }
+            ],
+            'RGB': [
+                { value: '32', text: 'BI' }, { value: '28', text: 'CIVE' }, { value: '17', text: 'ExG' },
+                { value: '19', text: 'ExGR' }, { value: '18', text: 'ExR' }, { value: '27', text: 'GCC' },
+                { value: '20', text: 'GLI' }, { value: '72', text: 'GLI2' }, { value: '25', text: 'MExG' },
+                { value: '23', text: 'NGBDI' }, { value: '31', text: 'NDBI' }, { value: '29', text: 'NDTI' },
+                { value: '16', text: 'NGRDI' }, { value: '21', text: 'RGBVI' }, { value: '30', text: 'SCI' },
+                { value: '22', text: 'TGI' }, { value: '33', text: 'UI' }, { value: '13', text: 'VARI' },
+                { value: '26', text: 'VEG' }, { value: '24', text: 'VDVI' }
+            ]
+        };
+
+        function updateIndexOptions() {
+            const imageType = document.getElementById('image_type').value;
+            const indexSelect = document.getElementById('index');
+            indexSelect.innerHTML = '';
+
+            const options = indexOptions[imageType] || [];
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.textContent = option.text;
+                indexSelect.appendChild(opt);
+            });
+
+            updateMethodDescription();
+        }
+
+        function updateMethodDescription() {
+            const indexSelect = document.getElementById('index');
+            const selectedIndex = indexSelect.value;
+            const descriptionDiv = document.getElementById('method_description');
+            descriptionDiv.innerHTML = methodDescriptions[selectedIndex];
+        }
+
+        function toggleDescriptions() {
+            const descriptionsDiv = document.getElementById('all_descriptions');
+            const toggleButton = document.getElementById('toggle_button');
+            if (descriptionsDiv.style.display === 'none' || descriptionsDiv.style.display === '') {
+                descriptionsDiv.innerHTML = '';
+                for (const [key, description] of Object.entries(methodDescriptions)) {
+                    descriptionsDiv.innerHTML += `<p id="desc-${key}"><strong>${description.split(' - ')[0]}</strong>: ${methodDetails[key]}</p>`;
+                }
+                descriptionsDiv.style.display = 'block';
+                toggleButton.textContent = 'Hide Info';
+            } else {
+                descriptionsDiv.style.display = 'none';
+                toggleButton.textContent = 'Band Indices';
+            }
+            highlightSelectedDescription();
+            scrollToHighlighted();
+        }
+
+        function highlightSelectedDescription() {
+            const indexSelect = document.getElementById('index');
+            const selectedIndex = indexSelect.value;
+            const allDescriptions = document.getElementById('all_descriptions').children;
+
+            for (let i = 0; i < allDescriptions.length; i++) {
+                allDescriptions[i].classList.remove('highlight');
+            }
+
+            const selectedDescription = document.getElementById(`desc-${selectedIndex}`);
+            if (selectedDescription) {
+                selectedDescription.classList.add('highlight');
+            }
+        }
+
+        function scrollToHighlighted() {
+            const indexSelect = document.getElementById('index');
+            const selectedIndex = indexSelect.value;
+            const selectedDescription = document.getElementById(`desc-${selectedIndex}`);
+            if (selectedDescription) {
+                selectedDescription.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function showPreview(url) {
+            const previewContainer = document.getElementById('preview-container');
+            const previewImage = document.getElementById('preview-image');
+            const downloadButton = document.getElementById('download-button');
+            const timestamp = new Date().getTime(); // Add timestamp to URL to avoid cache issues
+            previewImage.src = `${url}?t=${timestamp}`;
+            previewContainer.style.display = 'flex';
+            downloadButton.href = url;
+            downloadButton.classList.add('show');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function togglePreviewSize() {
+            const fullScreenContainer = document.getElementById('full-screen-container');
+            const fullScreenImage = document.getElementById('full-screen-image');
+            const previewImage = document.getElementById('preview-image');
+
+            fullScreenImage.src = previewImage.src;
+            fullScreenContainer.classList.add('show');
+        }
+
+        function closeFullScreen() {
+            const fullScreenContainer = document.getElementById('full-screen-container');
+            fullScreenContainer.classList.remove('show');
+        }
+
+        window.onload = () => {
+            updateIndexOptions();
+            document.getElementById('index').addEventListener('change', highlightSelectedDescription);
+            document.getElementById('upload-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const previewContainer = document.getElementById('preview-container');
+                const previewImage = document.getElementById('preview-image');
+                const downloadButton = document.getElementById('download-button');
+                const processingIndicator = document.getElementById('processing-indicator');
+
+                // Hide the preview while processing
+                previewContainer.style.display = 'none';
+                previewImage.src = '';
+                downloadButton.classList.remove('show');
+
+                // Show the processing indicator
+                processingIndicator.style.display = 'flex';
+
+                const formData = new FormData(this);
+                fetch('/process', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        showPreview(data.processed_image_url);
+                    })
+                    .catch(error => console.error('Error:', error))
+                    .finally(() => {
+                        // Hide the processing indicator
+                        processingIndicator.style.display = 'none';
+                    });
+            });
+            document.getElementById('enlarge-button').addEventListener('click', togglePreviewSize);
+            document.getElementById('close-button').addEventListener('click', closeFullScreen);
+
+            const footerText = document.querySelector('.footer .highlight-on-load');
+            const text = footerText.textContent;
+            footerText.innerHTML = text.split('').map(letter => `<span>${letter}</span>`).join('');
+            footerText.classList.add('highlight-on-load');
+
+            setTimeout(() => {
+                footerText.classList.remove('highlight-on-load');
+                footerText.querySelectorAll('span').forEach((span, index) => {
+                    span.style.animationDelay = `${index * 0.05}s`;
+                    span.style.animationDuration = '1s';
+                    span.style.animationName = 'letter-by-letter';
+                });
+            }, 1000);
+
+            setTimeout(() => {
+                footerText.querySelectorAll('span').forEach(span => {
+                    span.style.color = '#adb5bd';
+                });
+            }, text.length * 50 + 2000);
+        };
+    </script>
+</head>
+
+<body>
+
+
+
+    <div id="loading-screen">
+        <div class="hex-grid"></div>
+        <canvas id="bg"></canvas>
+        <div class="container">
+            <h1 class="glow glitch" id="main-title" data-text="Initializing system">
+                Initializing system<span class="dots"></span>
+              </h1>
+              
+            <div id="status-container"></div>
+        </div>
+        <div class="numbers" id="pseudonumbers">Receiving packets: 000000</div>
+    </div>
+    
+
+    <script>
+        const steps = [
+            'Initializing spectral core',
+            'Establishing vision link',
+            'Scanning input modules',
+            'Decoding your connection',
+            'Preparing vegetation indices',
+            'Rendering UI in quantum layer',
+            'Optimizing app performance vectors',
+            'System ready for image upload'
+        ];
+
+        const stepDurations = [800, 1200, 900, 1300, 1800, 1000, 1400, 2000];
+
+        const container = document.getElementById('status-container');
+        const mainTitle = document.getElementById('main-title');
+
+        steps.forEach((step, index) => {
+            const el = document.createElement('div');
+            el.className = 'status glow';
+            el.textContent = `> ${step}`;
+            container.appendChild(el);
+        });
+
+        const statusElements = document.querySelectorAll('.status');
+
+        let currentIndex = 0;
+        
+
+        function updateSteps() {
+            statusElements.forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+
+            if (steps[currentIndex] === 'System ready for image upload') {
+                mainTitle.innerHTML = '<span style="font-family:\'Courier New\', monospace; color:#00ffcc;">Loading app</span><span class="dots"></span>';
+                mainTitle.setAttribute('data-text', 'Loading app');
+
+                setTimeout(() => {
+                    const loadingScreen = document.getElementById('loading-screen');
+                    const formContainer = document.querySelector('.form-container');
+
+                    loadingScreen.style.display = 'none';
+                    formContainer.style.display = 'block';
+
+                    // Force scroll to top to reveal top content
+                    window.scrollTo(0, 0);
+                    document.documentElement.scrollTop = 0;
+                    document.body.scrollTop = 0;
+
+                    document.body.style.overflow = 'auto';
+                }, 15000);
+
+
+            } else if (currentIndex === 0) {
+                mainTitle.innerHTML = '<span style="font-family:\'Courier New\', monospace; color:#00ffcc;">Initializing system</span><span class="dots"></span>';
+                mainTitle.setAttribute('data-text', 'Initializing system');
+            }
+
+            currentIndex++;
+            if (currentIndex < steps.length) {
+                setTimeout(updateSteps, stepDurations[currentIndex]);
+            }
+        }
+
+        setTimeout(updateSteps, stepDurations[0]);
+
+        const numberDisplay = document.getElementById('pseudonumbers');
+        let counter = 0;
+        setInterval(() => {
+            counter += Math.floor(Math.random() * 99 + 1);
+            const hex = (Math.random() * 0xffffff << 0).toString(16).padStart(6, '0');
+            numberDisplay.textContent = `Receiving packets: ${counter.toString().padStart(6, '0')}  |  Hash: 0x${hex}`;
+        }, 100);
+
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let w, h;
+
+        function resizeCanvas() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        let particles = [];
+        const numParticles = 100;
+        for (let i = 0; i < numParticles; i++) {
+            particles.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                vx: (Math.random() - 0.5) * 1.2,
+                vy: (Math.random() - 0.5) * 1.2,
+                size: Math.random() * 1.2 + 0.4,
+                baseSize: Math.random() * 1.2 + 0.4,
+                angle: Math.random() * 2 * Math.PI
+            });
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#00ffcc';
+            ctx.strokeStyle = 'rgba(0,255,204,0.1)';
+
+            for (let i = 0; i < numParticles; i++) {
+                for (let j = i + 1; j < numParticles; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            const time = Date.now() * 0.003;
+            particles.forEach(p => {
+                p.angle += 0.02;
+                p.size = p.baseSize + Math.sin(time + p.angle) * 0.6;
+
+                ctx.beginPath();
+                ctx.moveTo(p.x + p.size, p.y);
+                for (let a = 0; a <= 2 * Math.PI; a += Math.PI / 3) {
+                    const px = p.x + Math.cos(a + p.angle) * p.size;
+                    const py = p.y + Math.sin(a + p.angle) * p.size;
+                    ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > w) p.vx *= -1;
+                if (p.y < 0 || p.y > h) p.vy *= -1;
+            });
+
+            requestAnimationFrame(drawParticles);
+        }
+        drawParticles();
+    </script>
+
+    <div class="processing" id="processing-indicator">
+        <div class="spinner"></div>
+        <div class="processing-text">Processing<span class="dot">.</span><span class="dot">.</span><span
+                class="dot">.</span></div>
+    </div>
+    <div class="form-container">
+        <a href="https://www.flycamczech.eu" target="_blank">
+            <img src="https://i.ibb.co/ZRmfy1K5/Fly-Cam-Czech-logo.png" alt="FlyCamCzech Logo" class="logo">
+        </a>
+        <h1 class="neon-title">FlyCamCzech MultiSpectral Image Processor</h1>
+
+        
+        <form id="upload-form" action="/process" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image" class="form-label label-glow label-fluo">Upload an Image:</label>
+                <input type="file" name="image" id="image" class="form-control form-control-file" required>
+            </div>
+            <div class="form-group">
+                <label for="image_type" class="form-label label-glow label-fluo">Select Sensor Type:</label>
+                <select name="image_type" id="image_type" class="form-select" onchange="updateIndexOptions()">
+                    <option value="RGN">RGN</option>
+                    <option value="NGB">NGB</option>
+                    <option value="RGB">RGB</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="index" class="form-label label-glow label-fluo">Select Spectral Indices:</label>
+                <select name="index" id="index" class="form-select" onchange="updateMethodDescription()">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="colormap" class="form-label label-glow label-fluo">Select Color Map:</label>
+                <select name="colormap" id="colormap" class="form-select">
+                    <option value="Viridis">Viridis</option>
+                    <option value="Jet">Jet</option>
+                    <option value="Magma">Magma</option>
+                    <option value="Plasma">Plasma</option>
+                    <option value="Inferno">Inferno</option>
+                    <option value="Cividis">Cividis</option>
+                    <option value="RdYlGn">Red-Yellow-Green (RdYlGn)</option>
+                    <option value="Blues">Blues</option>
+                    <option value="Greys">Greys</option>
+                    <option value="Haxby">Haxby</option>
+                    <option value="Cool">Cool</option>
+                    <option value="Spring">Spring</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Autumn">Autumn</option>
+                    <option value="Winter">Winter</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Coolwarm">Coolwarm</option>
+                </select>
+            </div>
+
+            <div id="method_description" class="mb-3"></div>
+            <button type="submit" class="btn btn-primary">Upload and Process</button>
+        </form>
+        <div class="image-preview" id="preview-container">
+            <img id="preview-image" src="" alt="Processed Image">
+            <button id="enlarge-button" class="enlarge-button">Enlarge Image</button>
+        </div>
+        <div class="spacing">
+            <button id="toggle_button" class="btn btn-info" onclick="toggleDescriptions()">Show Spectral
+                Indices</button>
+            <a id="download-button" class="download-button" href="" download="processed_image.jpg">Download Processed
+                Image</a>
+        </div>
+        <div id="all_descriptions" class="mt-4 spacing"></div>
+        <div class="footer">
+            <p>Bc. Jakub Ešpandr, <a href="https://www.flycamczech.eu" target="_blank">FlyCamCzech.eu</a></p>
+            <p class="highlight-on-load">Version 1.2. CrimsonCardinal, March 2025</p>
+
+            <div style="margin-top: 1rem; text-align: center;">
+                <img src="https://i.ibb.co/ZRV4wQbK/Born4-Flight-logo.png" alt="Born4Flight Logo"
+                    style="max-width: 120px; margin-bottom: 0.5rem;">
+                <p style="font-size: 0.85rem; color: #adb5bd; margin: 0;">
+                    This application is protected under the Born4Flight s.r.o. trademark.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="full-screen-container" class="full-screen">
+        <img id="full-screen-image" src="" alt="Full Screen Image">
+        <button id="close-button" class="close-button">&times;</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>
